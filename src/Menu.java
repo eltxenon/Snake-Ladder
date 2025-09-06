@@ -38,13 +38,13 @@ public class Menu {
 
         botButton.setOnAction(e -> {
             GameUI gameUI = new GameUI();
-            Scene gameScene = gameUI.createScene(stage, true);
+            Scene gameScene = gameUI.createScene(stage, false);
             stage.setScene(gameScene);
         });
 
         pvpButton.setOnAction(e -> {
             GameUI gameUI = new GameUI();
-            Scene gameScene = gameUI.createScene(stage, false);
+            Scene gameScene = gameUI.createScene(stage, true);
             stage.setScene(gameScene);
         });
 
