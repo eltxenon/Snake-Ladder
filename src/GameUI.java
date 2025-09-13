@@ -56,8 +56,8 @@ public class GameUI {
                 playSound("dice.mp3");
 
                 int pos = currentPlayer.equals("Red") ? red.getPosition() : blue.getPosition();
-                if (board.getSnakes().containsKey(pos)) playSound("snake.wav");
-                else if (board.getLadders().containsKey(pos)) playSound("ladder.wav");
+                if (board.getSnakes().containsKey(pos)) playSound("snake.mp3");
+                else if (board.getLadders().containsKey(pos)) playSound("ladder.mp3");
             }
             
             if (!winnerLabel.getText().isEmpty()) {
