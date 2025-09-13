@@ -1,25 +1,30 @@
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.net.URL;
+
 public class GameUI {
-    private GameBoard board;  
+    private GameBoard board;
     private Player red;
     private Player blue;
     private GameController controller;
 
+    private TextArea historyArea = new TextArea();
+
     public Scene createScene(Stage stage, boolean isVsComputer, SnakeLadderConfig config) {
+        
         board = new GameBoard(config);
         red = new Player("Red", "img_4.png");
         blue = new Player(isVsComputer ? "Bot" : "Blue", "img_3.png");
@@ -41,18 +46,66 @@ public class GameUI {
 
         Button rollButton = new Button("🎲 Rolling");
         rollButton.setPrefWidth(150);
-        rollButton.setOnAction(e -> controller.playTurn(stage, diceLabel, playerLabel, winnerLabel, rollButton));
+        rollButton.setOnAction(e -> {
+            int diceValue = controller.playTurn(stage, diceLabel, playerLabel, winnerLabel, rollButton);
 
-        Button showButton = new Button("📜 نمایش مار و نردبون‌ها");
-        showButton.setPrefWidth(150);
-        showButton.setOnAction(e -> showSnakesAndLadders());
+            if (diceValue > 0) {
+                String currentPlayer = playerLabel.getText().replace("Player : ", "");
+                historyArea.appendText(currentPlayer + " 🎲 : " + diceValue + "\n");
 
-        VBox controlPane = new VBox(20, playerLabel, diceLabel, rollButton, winnerLabel, showButton);
+                playSound("dice.wav");
+
+                int pos = currentPlayer.equals("Red") ? red.getPosition() : blue.getPosition();
+                if (board.getSnakes().containsKey(pos)) playSound("snake.wav");
+                else if (board.getLadders().containsKey(pos)) playSound("ladder.wav");
+            }
+            
+            if (!winnerLabel.getText().isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("بازی تمام شد");
+                alert.setHeaderText(winnerLabel.getText());
+                alert.setContentText("می‌خواهید دوباره بازی کنید؟");
+                alert.showAndWait();
+            }
+        });
+
+        Button refreshButton = new Button("🔄 رفرش بازی");
+        refreshButton.setPrefWidth(150);
+        refreshButton.setOnAction(e -> {
+            red.setPosition(1);
+            blue.setPosition(1);
+            controller.resetGame();
+
+            diceLabel.setText("Dice : -");
+            playerLabel.setText("Player : Red");
+            winnerLabel.setText("");
+            rollButton.setDisable(false);
+            historyArea.clear();
+        });
+
+        historyArea.setEditable(false);
+        historyArea.setPrefHeight(200);
+        historyArea.setPrefWidth(180);
+
+        VBox controlPane = new VBox(20, playerLabel, diceLabel, rollButton, winnerLabel, refreshButton,
+                new Text("📜 تاریخچه:"), historyArea);
         controlPane.setPrefWidth(200);
         controlPane.setAlignment(Pos.CENTER);
         controlPane.setStyle("-fx-background-color: #f0f0f0;");
 
         return new Scene(new HBox(boardPane, controlPane), 800, 600);
+    }
+
+    private void playSound(String fileName) {
+        try {
+            URL resource = getClass().getResource(fileName);
+            if (resource != null) {
+                AudioClip clip = new AudioClip(resource.toString());
+                clip.play();
+            }
+        } catch (Exception e) {
+            System.out.println("مشکل در پخش صدا: " + fileName);
+        }
     }
 
     public void showSnakesAndLadders() {
