@@ -9,25 +9,27 @@ import javafx.util.Duration;
 import java.util.Random;
 
 public class GameController {
-        private final GameBoard board;
-        private final Player player1;
-        private final Player player2;
-        private boolean isPlayer1Turn = true;
-        private boolean gameOver = false;
-        private final boolean isVsComputer;
-        private final Random random = new Random();
+    private final GameBoard board;
+    private final Player player1;
+    private final Player player2;
+    private boolean isPlayer1Turn = true;
+    private boolean gameOver = false;
+    private final boolean isVsComputer;
+    private final Random random = new Random();
 
-        public GameController(GameBoard board, Player p1, Player p2, boolean isVsComputer) {
-            this.board = board;
-            this.player1 = p1;
-            this.player2 = p2;
-            this.isVsComputer = isVsComputer;
-        }
-    public void playTurn(Stage stage, Text diceLabel, Text playerLabel, Text winnerLabel, Button rollButton) {
-        if (gameOver) return;
+    public GameController(GameBoard board, Player p1, Player p2, boolean isVsComputer) {
+        this.board = board;
+        this.player1 = p1;
+        this.player2 = p2;
+        this.isVsComputer = isVsComputer;
+    }
+
+    public int playTurn(Stage stage, Text diceLabel, Text playerLabel, Text winnerLabel, Button rollButton) {
+        if (gameOver) return -1; 
 
         Player current = isPlayer1Turn ? player1 : player2;
         int dice = random.nextInt(6) + 1;
+
         diceLabel.setText("Dice : " + dice);
         playerLabel.setText("Player : " + current.getName());
 
@@ -37,10 +39,7 @@ public class GameController {
         SequentialTransition sequence = new SequentialTransition();
 
         TranslateTransition move1 = current.moveTo(target);
-        move1.setOnFinished(e -> {
-            current.updatePosition(target);
-            current.setPosition(target);
-        });
+        move1.setOnFinished(e -> current.setPosition(target));
         sequence.getChildren().add(move1);
 
         if (finalPos != target) {
@@ -48,10 +47,7 @@ public class GameController {
             sequence.getChildren().add(pause);
 
             TranslateTransition move2 = current.moveTo(finalPos);
-            move2.setOnFinished(e -> {
-                current.updatePosition(finalPos);
-                current.setPosition(finalPos);
-            });
+            move2.setOnFinished(e -> current.setPosition(finalPos));
             sequence.getChildren().add(move2);
         }
 
@@ -72,5 +68,11 @@ public class GameController {
         });
 
         sequence.play();
+        return dice; 
+    }
+
+    public void resetGame() {
+        gameOver = false;
+        isPlayer1Turn = true;
     }
 }
