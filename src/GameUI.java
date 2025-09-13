@@ -53,7 +53,7 @@ public class GameUI {
                 String currentPlayer = playerLabel.getText().replace("Player : ", "");
                 historyArea.appendText(currentPlayer + " 🎲 : " + diceValue + "\n");
 
-                playSound("dice.wav");
+                playSound("dice.mp3");
 
                 int pos = currentPlayer.equals("Red") ? red.getPosition() : blue.getPosition();
                 if (board.getSnakes().containsKey(pos)) playSound("snake.wav");
