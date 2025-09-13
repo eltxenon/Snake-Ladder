@@ -1,6 +1,8 @@
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -10,6 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import java.io.IOException;
 
 public class GameUI {
     public Scene createScene(Stage stage, boolean isVsComputer) {
@@ -40,6 +43,25 @@ public class GameUI {
         controlPane.setPrefWidth(200);
         controlPane.setAlignment(Pos.CENTER);
         controlPane.setStyle("-fx-background-color: #f0f0f0;");
+
+        // 🔹 اینجا کد لود سیو اضافه شد
+        if (GameSaver.saveExists()) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                    "بازی ذخیره‌شده‌ای وجود دارد. ادامه بدهیم؟",
+                    ButtonType.YES, ButtonType.NO);
+
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.YES) {
+                    try {
+                        int[] positions = GameSaver.loadGame();
+                        red.setPosition(positions[0]);
+                        blue.setPosition(positions[1]);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
+        }
 
         return new Scene(new HBox(boardPane, controlPane), 800, 600);
     }
