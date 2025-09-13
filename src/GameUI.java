@@ -44,10 +44,9 @@ public class GameUI {
         controlPane.setAlignment(Pos.CENTER);
         controlPane.setStyle("-fx-background-color: #f0f0f0;");
 
-        // 🔹 اینجا کد لود سیو اضافه شد
         if (GameSaver.saveExists()) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                    "بازی ذخیره‌شده‌ای وجود دارد. ادامه بدهیم؟",
+                    "continue?",
                     ButtonType.YES, ButtonType.NO);
 
             alert.showAndWait().ifPresent(response -> {
